@@ -12,15 +12,7 @@
     });
   });
 
-  $: console.log("Current user: MAIN PAGE", $user);
-
-  function togglePasswordRecovery() {
-    showPasswordRecovery = !showPasswordRecovery;
-  }
-
-  function handleRecoveryComplete() {
-    showPasswordRecovery = false;
-  }
+  $: console.log("Current user: AUTH", $user);
 </script>
 
 <!-- Auth Forms -->
