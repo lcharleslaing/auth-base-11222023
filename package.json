@@ -1,5 +1,5 @@
 {
-  "name": "tgy-lee-work",
+  "name": "auth-base-11222023",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -14,14 +14,12 @@
     "daisyui": "^4.4.2",
     "postcss": "^8.4.24",
     "postcss-load-config": "^4.0.1",
-    "prisma": "^5.6.0",
     "svelte": "^4.0.5",
     "tailwindcss": "^3.3.2",
     "vite": "^4.4.2"
   },
   "type": "module",
   "dependencies": {
-    "@prisma/client": "5.6.0",
     "@supabase/supabase-js": "^2.38.5"
   }
 }
