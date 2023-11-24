@@ -9,7 +9,7 @@
     { title: "Home", href: "/" },
     {
       title: "Auth",
-      href: "#", // Updated to a placeholder since it has a submenu
+      href: "/auth", // Updated to a placeholder since it has a submenu
       submenu: [
         { title: "Register", href: "/" }, // Link to your Register page
         { title: "Signin", href: "/" }, // Link to your Login page

@@ -1,0 +1,36 @@
+├── .env
+├── example.env
+├── package.json
+├── postcss.config.cjs
+├── README.md
+├── src
+│   ├── app.html
+│   ├── app.pcss
+│   ├── lib
+│   │   ├── components
+│   │   │   ├── AppName.svelte
+│   │   │   ├── Login.svelte
+│   │   │   ├── Logout.svelte
+│   │   │   ├── MenuLinks.svelte
+│   │   │   ├── Navbar.svelte
+│   │   │   ├── PasswordRecovery.svelte
+│   │   │   └── Register.svelte
+│   │   ├── index.js
+│   │   ├── stores.js
+│   │   └── supabase.js
+│   └── routes
+│       ├── +layout.svelte
+│       └── +page.svelte
+├── static
+│   └── favicon.png
+├── svelte.config.js
+├── tailwind.config.cjs
+└── vite.config.js
+
+.env Variables:
+DATABASE_URL
+VITE_SUPABASE_URL
+VITE_SUPABASE_DB_PW
+VITE_SUPABASE_ANON_KEY
+VITE_SUPABASE_SERVICE_ROLE_KEY
+VITE_APPNAME

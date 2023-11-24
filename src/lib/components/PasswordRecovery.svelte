@@ -1,6 +1,8 @@
 <script>
   import { supabase } from "$lib/supabase";
-  export let onRecoveryComplete;
+  import { writable } from "svelte/store";
+
+  export const recoveryComplete = writable(false);
 
   let email = "";
   let message = "";
@@ -8,14 +10,14 @@
 
   async function recoverPassword() {
     const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+
     if (error) {
-      console.log("Error in password recovery: PW RECOVRY", error);
       message = error.message;
       isError = true;
     } else {
       message = "Password recovery email sent. Please check your email.";
       isError = false;
-      onRecoveryComplete(); // Call the callback function
+      recoveryComplete.set(true); // Update the store to indicate completion
     }
   }
 </script>

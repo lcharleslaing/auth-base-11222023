@@ -1,9 +1,10 @@
 <script>
-  import { supabase } from "$lib/supabase"; // Adjust path as needed
+  import { supabase } from "$lib/supabase";
+  import { goto } from "$app/navigation";
 
   async function logout() {
     await supabase.auth.signOut();
-    // Redirect or update UI after logout
+    goto("/auth"); // Adjust the route as needed
   }
 </script>
 

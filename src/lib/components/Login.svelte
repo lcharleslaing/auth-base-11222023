@@ -1,27 +1,24 @@
 <script>
-  import { supabase } from "$lib/supabase"; // Adjust path as needed
+  import { supabase } from "$lib/supabase";
+  import { goto } from "$app/navigation"; // Import goto for redirection
 
   let email = "";
   let password = "";
   let message = "";
 
   async function login() {
-    console.log("Attempting to log in LOGIN:", email);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+
     if (error) {
-      console.log("Login error LOGIN:", error);
       message = error.message;
     } else {
-      const user = data.user;
-      if (user) {
-        console.log("Login successful LOGIN:", user);
-        message = `Login successful. Welcome back, ${user.email}!`;
+      if (data.user) {
+        goto("/"); // Adjust the route as needed
       } else {
-        console.log("Login successful, but user data is undefined. LOGIN");
-        message = "Login successful, but unable to retrieve user data. LOGIN";
+        message = "Login successful, but unable to retrieve user data.";
       }
     }
   }

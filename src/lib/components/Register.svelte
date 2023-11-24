@@ -1,30 +1,22 @@
 <script>
-  import { onMount } from "svelte";
-  import { supabase } from "$lib/supabase"; // Adjust path as needed
+  import { supabase } from "$lib/supabase";
 
   let email = "";
   let password = "";
   let confirmPassword = "";
   let message = "";
 
-  onMount(() => {
-    console.log("Register component mounted REGISTER");
-  });
-
   async function register() {
-    console.log("Attempting to register REGISTER:", email);
     if (password !== confirmPassword) {
-      message = "Passwords do not match. REGISTER";
-      console.log("Password mismatch");
+      message = "Passwords do not match.";
       return;
     }
 
     const { user, error } = await supabase.auth.signUp({ email, password });
+
     if (error) {
-      console.log("Registration error:", error);
       message = error.message;
     } else {
-      console.log("Registration successful:", user);
       message = `Registration successful. Welcome, ${user.email}!`;
     }
   }
