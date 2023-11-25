@@ -1,0 +1,10 @@
+{
+    "watch": [
+        "src/**/*"
+    ],
+    "ext": "svelte,js,ts",
+    "ignore": [
+        "src/project-code.md"
+    ],
+    "exec": "node project_code.js && vite dev"
+}
