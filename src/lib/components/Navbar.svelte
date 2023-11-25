@@ -11,9 +11,10 @@
       title: "Auth",
       href: "/auth", // Updated to a placeholder since it has a submenu
       submenu: [
-        { title: "Register", href: "/" }, // Link to your Register page
-        { title: "Signin", href: "/" }, // Link to your Login page
-        { title: "Logout", href: "/" }, // Link to your Logout page
+        { title: "Register", href: "/auth" }, // Link to your Register page
+        { title: "Signin", href: "/auth" }, // Link to your Login page
+        { title: "Logout", href: "/auth" }, // Link to your Logout page
+        { title: "Profile", href: "/auth/profile" }, // Link to your Logout page
       ],
     },
     // {
