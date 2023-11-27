@@ -1,377 +1,352 @@
-## File: lib\components\AppName.svelte
+## File: lib\components\BibleVerses.svelte
 
 ```
 <script>
-  export let appname = import.meta.env
-    ? import.meta.env.VITE_APPNAME
-    : "(.env) VITE_APPNAME=YourName)";
 </script>
 
-<span>{appname}</span>
+<div class="overflow-y-auto text-center font-serif my-2 px-3">
+  <div class="card w-96 bg-slate-100 bg-opacity-60 p-3 mx-auto rounded-2xl">
+    <!-- This is to be pulled from the database on supabase -->
+    <div class="text-left font-bold">Genesis 22:18</div>
+    <div class="text-justify">
+      And in thy seed shall all the nations of the earth be blessed; because
+      thou hast obeyed my voice.
+    </div>
+  </div>
+</div>
 
 ```
 
-## File: lib\components\Login.svelte
+## File: lib\components\IsraelTime.svelte
 
 ```
 <script>
-  import { supabase } from "$lib/supabase";
-  import { goto } from "$app/navigation"; // Import goto for redirection
+  import { onMount, onDestroy } from "svelte";
+  import moment from "moment-timezone";
+  import YouTubeVideo from "./YouTubeVideo.svelte";
+  import BibleVerses from "./BibleVerses.svelte";
 
-  let email = "";
-  let password = "";
-  let message = "";
+  let currentTime = { day: "", month: "", year: "", time: "" };
+  let jewishDate = { day: "", month: "", year: "" };
+  let countdownToSunrise = "";
+  let countdownToSunset = "";
+  let timeInterval; // Interval for updating time every second
+  let dateInterval; // Interval for updating Jewish date every hour
 
-  async function login() {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+  // Define the constant end date for the countdown
+  const countdownEndDate = moment("2023-12-07 16:35:00"); // Replace with your end date and time
+
+  // Update the time every second
+  function updateTime() {
+    const timeInJerusalem = moment().tz("Asia/Jerusalem");
+    currentTime.time = timeInJerusalem.format("hh:mm:ss a");
+    currentTime.day = timeInJerusalem.format("DD");
+    currentTime.month = timeInJerusalem.format("MMMM");
+    currentTime.year = timeInJerusalem.format("YYYY");
+  }
+
+  async function fetchJewishDate() {
+    const gregorianToday = moment().tz("Asia/Jerusalem");
+    const response = await fetch(
+      `https://www.hebcal.com/converter?cfg=json&gy=${gregorianToday.format(
+        "YYYY",
+      )}&gm=${gregorianToday.format("MM")}&gd=${gregorianToday.format(
+        "DD",
+      )}&g2h=1&lg=s`,
+    );
+    const data = await response.json();
+    jewishDate.day = data.hd;
+    jewishDate.month = data.hm;
+    jewishDate.year = data.hy;
+  }
+
+  async function fetchSunriseSunsetTimes() {
+    const today = moment().tz("Asia/Jerusalem").format("YYYY-MM-DD");
+    const apiUrl = `https://www.hebcal.com/hebcal?v=1&cfg=json&c=on&geo=pos&latitude=[YOUR_LATITUDE]&longitude=[YOUR_LONGITUDE]&tzid=[YOUR_TIMEZONE]&start=${today}&end=${today}`;
+
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+
+    // Extract sunrise and sunset times and adjust them to the end date
+    const sunriseTime = countdownEndDate.clone().set({
+      hour: moment("06:00", "HH:mm").hour(),
+      minute: moment("06:00", "HH:mm").minute(),
+    });
+    const sunsetTime = countdownEndDate.clone().set({
+      hour: moment("18:00", "HH:mm").hour(),
+      minute: moment("18:00", "HH:mm").minute(),
     });
 
-    if (error) {
-      message = error.message;
-    } else {
-      if (data.user) {
-        goto("/"); // Adjust the route as needed
-      } else {
-        message = "Login successful, but unable to retrieve user data.";
-      }
-    }
+    setInterval(() => {
+      const now = moment();
+      countdownToSunrise = formatCountdown(now, sunriseTime);
+      countdownToSunset = formatCountdown(now, sunsetTime);
+    }, 1000);
   }
+
+  function formatCountdown(currentTime, eventTime) {
+    const duration = moment.duration(eventTime.diff(currentTime));
+    return `${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`;
+  }
+
+  onMount(() => {
+    updateTime();
+    fetchJewishDate();
+    fetchSunriseSunsetTimes();
+    timeInterval = setInterval(updateTime, 1000); // Update time every second
+    dateInterval = setInterval(fetchJewishDate, 1000 * 60 * 60); // Update Jewish date every hour
+  });
+
+  onDestroy(() => {
+    clearInterval(timeInterval);
+    clearInterval(dateInterval);
+  });
 </script>
 
-<div class="flex flex-column justify-center">
-  <form on:submit|preventDefault={login} class="form-control w-full max-w-xs">
-    <label class="label">
-      <span class="label-text">Email</span>
-    </label>
-    <input
-      type="email"
-      bind:value={email}
-      placeholder="Email"
-      class="input input-bordered w-full max-w-xs"
-      required
-    />
+<!-- HTML layout -->
+<div
+  class="flex flex-col w-screen h-screen bg-cover bg-center"
+  style="background-image: url('/rapture.png');"
+>
+  <!-- Placeholder div for the Video above the clock -->
+  <div class="flex-grow"></div>
 
-    <label class="label">
-      <span class="label-text">Password</span>
-    </label>
-    <input
-      type="password"
-      bind:value={password}
-      placeholder="Password"
-      class="input input-bordered w-full max-w-xs"
-      required
-    />
-
-    <button type="submit" class="btn btn-primary mt-4">Login</button>
-
-    {#if message}
-      <div class="alert alert-info mt-4">
-        {message}
+  <!-- Clock, Date, and Countdowns -->
+  <div class="flex flex-grow-0 justify-center items-center text-4xl">
+    <div class="card bg-slate-50 bg-opacity-60 p-3 shadow-lg rounded-2xl">
+      <!-- Jewish Date -->
+      <div class="text-center font-serif m-1 mb-4">
+        <div class="jewish-date-day">{jewishDate.day}</div>
+        <div class="jewish-date-month">{jewishDate.month}</div>
+        <div class="jewish-date-year">{jewishDate.year}</div>
       </div>
-    {/if}
-  </form>
-</div>
+      <hr />
 
-```
+      <!-- Gregorian Date -->
+      <div class="text-center font-serif mb-4">
+        <div class="gregorian-date-day">{currentTime.day}</div>
+        <div class="gregorian-date-month">{currentTime.month}</div>
+        <div class="gregorian-date-year">{currentTime.year}</div>
+      </div>
+      <hr />
 
-## File: lib\components\Logout.svelte
+      <!-- Current Time -->
+      <div class="time text-center font-serif">{currentTime.time}</div>
+      <hr />
 
-```
-<script>
-  import { supabase } from "$lib/supabase";
-  import { goto } from "$app/navigation";
-
-  async function logout() {
-    await supabase.auth.signOut();
-    goto("/auth"); // Adjust the route as needed
-  }
-</script>
-
-<div class="flex justify-center">
-  <button on:click={logout} class="btn btn-secondary mt-4">Logout</button>
-</div>
-
-```
-
-## File: lib\components\MenuLinks.svelte
-
-```
-<script>
-  export let menuItems = [];
-</script>
-
-<!-- Smaller Screens: Original Dropdown Menu -->
-<div class="lg:hidden">
-  <ul class="menu">
-    {#each menuItems as menuItem}
-      <li>
-        <a href={menuItem.href}>{menuItem.title}</a>
-        {#if menuItem.submenu}
-          <ul class="p-2">
-            {#each menuItem.submenu as submenuItem}
-              <li><a href={submenuItem.href}>{submenuItem.title}</a></li>
-            {/each}
-          </ul>
-        {/if}
-      </li>
-    {/each}
-  </ul>
-</div>
-
-<!-- Larger Screens: Horizontal Menu with Dropdowns
-<div class="hidden lg:block">
-  <ul class="menu menu-horizontal px-1">
-    {#each menuItems as menuItem}
-      <li tabindex="0">
-        <a href={menuItem.href}>{menuItem.title}</a>
-        {#if menuItem.submenu}
-          <details>
-            <summary>{menuItem.title}</summary>
-            <ul class="p-2">
-              {#each menuItem.submenu as submenuItem}
-                <li><a href={submenuItem.href}>{submenuItem.title}</a></li>
-              {/each}
-            </ul>
-          </details>
-        {/if}
-      </li>
-    {/each}
-  </ul>
-</div> -->
-
-<!-- Larger Screens: Horizontal Menu with Dropdowns -->
-<div class="hidden lg:block">
-  <ul class="menu menu-horizontal px-1">
-    {#each menuItems as menuItem}
-      {#if menuItem.submenu}
-        <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-        <li tabindex="0">
-          <details>
-            <summary>{menuItem.title}</summary>
-            <ul class="p-2">
-              {#each menuItem.submenu as submenuItem}
-                <li><a href={submenuItem.href}>{submenuItem.title}</a></li>
-              {/each}
-            </ul>
-          </details>
-        </li>
-      {:else}
-        <li><a href={menuItem.href}>{menuItem.title}</a></li>
-      {/if}
-    {/each}
-  </ul>
-</div>
-
-```
-
-## File: lib\components\Navbar.svelte
-
-```
-<script>
-  import AppName from "./AppName.svelte";
-  import MenuLinks from "./MenuLinks.svelte";
-  export const appname = import.meta.env
-    ? import.meta.env.VITE_APPNAME
-    : "DefaultAppName";
-
-  const menuItems = [
-    { title: "Home", href: "/" },
-    {
-      title: "Auth",
-      href: "/auth", // Updated to a placeholder since it has a submenu
-      submenu: [
-        { title: "Register", href: "/auth" }, // Link to your Register page
-        { title: "Signin", href: "/auth" }, // Link to your Login page
-        { title: "Logout", href: "/auth" }, // Link to your Logout page
-        { title: "Profile", href: "/auth/profile" }, // Link to your Logout page
-      ],
-    },
-    // {
-    //   title: "Lee's Time",
-    //   href: "#", // Updated to a placeholder since it has a submenu
-    //   submenu: [
-    //     { title: "Physical Work", href: "/physical-work" },
-    //     { title: "Brain Work", href: "/brain-work" },
-    //     { title: "Rates", href: "/rates" },
-    //     { title: "Categories", href: "/categories" },
-    //   ],
-    // },
-    // { title: "Bible Ask Help", href: "/help/bible-ask" },
-  ];
-</script>
-
-<div class="navbar bg-base-100 shadow">
-  <div class="navbar-start">
-    <div class="dropdown">
-      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-      <!-- svelte-ignore a11y-label-has-associated-control -->
-      <label tabindex="0" class="btn btn-ghost lg:hidden">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M4 6h16M4 12h8m-8 6h16"
-          />
-        </svg>
-      </label>
-      <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
-      <ul
-        tabindex="0"
-        class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
-      >
-        <MenuLinks {menuItems} />
-      </ul>
+      <!-- Countdown to Sunrise and Sunset -->
+      <div class="text-center font-serif">
+        <div>Day End: {countdownToSunrise}</div>
+        <div>Day Start: {countdownToSunset}</div>
+      </div>
     </div>
-    <a href="/" class="btn btn-ghost text-xl"><AppName /></a>
   </div>
-  <div class="navbar-center hidden lg:flex">
-    <MenuLinks {menuItems} />
+
+  <!-- Placeholder div for the Bible verse below the clock -->
+  <div class="flex-grow"></div>
+</div>
+
+<!-- Styles remain the same -->
+
+<style>
+  .jewish-date-day {
+    /* styles for Jewish date day */
+    font-size: 75px;
+    line-height: normal;
+  }
+  .jewish-date-month {
+    /* styles for Jewish date month */
+    font-size: 75px;
+    line-height: normal;
+  }
+  .jewish-date-year {
+    /* styles for Jewish date year */
+    font-size: 75px;
+    line-height: normal;
+  }
+
+  .gregorian-date-day {
+    /* styles for Gregorian date day */
+    font-size: 75px;
+    line-height: normal;
+  }
+  .gregorian-date-month {
+    /* styles for Gregorian date month */
+    font-size: 75px;
+    line-height: normal;
+  }
+  .gregorian-date-year {
+    /* styles for Gregorian date year */
+    font-size: 75px;
+    line-height: normal;
+  }
+  .time {
+    /* styles for Gregorian date year */
+    font-size: 75px;
+    line-height: normal;
+  }
+</style>
+
+```
+
+## File: lib\components\JewishCountdown.svelte
+
+```
+<script>
+  import { onMount } from "svelte";
+
+  let Hebcal, HDate;
+  let targetDate;
+  let timeLeft = "Loading...";
+
+  onMount(() => {
+    loadHebcal().then(() => {
+      initializeCountdown();
+      startCountdown();
+    });
+  });
+
+  async function loadHebcal() {
+    if (typeof window !== "undefined") {
+      const hebcalModule = await import("hebcal");
+      Hebcal = hebcalModule.Hebcal;
+      HDate = hebcalModule.HDate;
+    }
+  }
+
+  function getGregorianDateForJewish(jewishYear, jewishMonth, jewishDay) {
+    const jewishDate = new HDate(jewishDay, jewishMonth, jewishYear);
+    return jewishDate.greg();
+  }
+
+  function initializeCountdown() {
+    const currentJewishYear = new HDate().getFullYear();
+    targetDate = getGregorianDateForJewish(currentJewishYear, 9, 24);
+  }
+
+  function startCountdown() {
+    const interval = setInterval(() => {
+      const now = new Date();
+      const difference = targetDate - now;
+      if (difference > 0) {
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((difference / 1000 / 60) % 60);
+        const seconds = Math.floor((difference / 1000) % 60);
+        timeLeft = `${hours}h ${minutes}m ${seconds}s`;
+      } else {
+        timeLeft = "The day has arrived!";
+        clearInterval(interval);
+      }
+    }, 1000);
+  }
+</script>
+
+<h1>Countdown to 9/24 Jewish Date: {timeLeft}</h1>
+
+```
+
+## File: lib\components\NewIsraelTime.svelte
+
+```
+<script>
+  import { onMount, onDestroy } from "svelte";
+  import moment from "moment-timezone";
+
+  let currentTime = { day: "", month: "", year: "", time: "" };
+  let countdownToStart = "";
+  let countdownToEnd = "";
+  let timeInterval;
+
+  async function fetch924SunsetTimes() {
+    // Adjust the year as needed. This fetches the entire year's data.
+    const apiUrl = `https://www.hebcal.com/hebcal?v=1&cfg=json&c=on&geo=pos&latitude=31.7683&longitude=35.2137&tzid=Asia/Jerusalem&year=2023`;
+
+    try {
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      console.log("API response:", data); // Debug: Log the API response
+
+      // Process the data to find sunset times for the Jewish date 9/24
+      // Since the structure of the data and the way to identify 9/24 is unclear, this part is left for further implementation
+      // ...
+    } catch (error) {
+      console.error("Error fetching sunset times:", error);
+    }
+  }
+
+  function updateCurrentJewishDate() {
+    const now = moment().tz("Asia/Jerusalem");
+    currentTime.time = now.format("HH:mm:ss A");
+    currentTime.day = now.format("DD");
+    currentTime.month = now.format("MMMM");
+    currentTime.year = now.format("YYYY");
+  }
+
+  function calculateCountdown() {
+    // This function should be updated once startOf924 and endOf924 are correctly determined
+    // ...
+  }
+
+  function formatCountdown(currentTime, eventTime) {
+    const duration = moment.duration(eventTime.diff(currentTime));
+    return `${duration.hours()}h ${duration.minutes()}m ${duration.seconds()}s`;
+  }
+
+  onMount(() => {
+    fetch924SunsetTimes();
+    updateCurrentJewishDate();
+    timeInterval = setInterval(() => {
+      updateCurrentJewishDate();
+      // calculateCountdown(); // Uncomment this once startOf924 and endOf924 are set
+    }, 1000); // Update every second
+  });
+
+  onDestroy(() => {
+    clearInterval(timeInterval);
+  });
+</script>
+
+<div class="flex flex-col w-screen h-screen">
+  <div class="flex-grow"></div>
+
+  <div class="flex flex-grow-0 justify-center items-center">
+    <div class="card">
+      <div class="text-center">
+        Current Time in Jerusalem: {currentTime.time}
+        <br />
+        Date: {currentTime.day}
+        {currentTime.month}
+        {currentTime.year}
+      </div>
+      <hr />
+
+      <div class="text-center">
+        <div>Countdown to Start of 9/24: {countdownToStart}</div>
+        <div>Countdown to End of 9/24: {countdownToEnd}</div>
+      </div>
+    </div>
   </div>
-  <div class="navbar-end">
-    <a href="/" class="btn">Share</a>
-  </div>
+
+  <div class="flex-grow"></div>
 </div>
 
 ```
 
-## File: lib\components\PasswordRecovery.svelte
+## File: lib\components\YouTubeVideo.svelte
 
 ```
 <script>
-  import { supabase } from "$lib/supabase";
-  import { writable } from "svelte/store";
-
-  export const recoveryComplete = writable(false);
-
-  let email = "";
-  let message = "";
-  let isError = false;
-
-  async function recoverPassword() {
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
-
-    if (error) {
-      message = error.message;
-      isError = true;
-    } else {
-      message = "Password recovery email sent. Please check your email.";
-      isError = false;
-      recoveryComplete.set(true); // Update the store to indicate completion
-    }
-  }
 </script>
 
-<!-- Your form HTML here -->
-
-<div class="flex flex-column justify-center m-4">
-  <form
-    on:submit|preventDefault={recoverPassword}
-    class="form-control w-full max-w-xs"
-  >
-    <label class="label">
-      <span class="label-text">Enter your email to recover your password</span>
-    </label>
-    <input
-      type="email"
-      bind:value={email}
-      class="input input-bordered w-full max-w-xs"
-      required
-    />
-
-    <button type="submit" class="btn btn-primary mt-4">Recover Password</button>
-
-    {#if message}
-      <div class={error ? "alert alert-error" : "alert alert-success"} mt-4>
-        {message}
-      </div>
-    {/if}
-  </form>
-</div>
-
-```
-
-## File: lib\components\Register.svelte
-
-```
-<script>
-  import { supabase } from "$lib/supabase";
-
-  let email = "";
-  let password = "";
-  let confirmPassword = "";
-  let message = "";
-
-  async function register() {
-    if (password !== confirmPassword) {
-      message = "Passwords do not match.";
-      return;
-    }
-
-    const { user, error } = await supabase.auth.signUp({ email, password });
-
-    if (error) {
-      message = error.message;
-    } else {
-      message = `Registration successful. Welcome, ${user.email}!`;
-    }
-  }
-</script>
-
-<div class="flex flex-column justify-center">
-  <form
-    on:submit|preventDefault={register}
-    class="form-control w-full max-w-xs"
-  >
-    <label class="label">
-      <span class="label-text">Email</span>
-    </label>
-    <input
-      type="email"
-      bind:value={email}
-      placeholder="Email"
-      class="input input-bordered w-full max-w-xs"
-      required
-    />
-
-    <label class="label">
-      <span class="label-text">Password</span>
-    </label>
-    <input
-      type="password"
-      bind:value={password}
-      placeholder="Password"
-      class="input input-bordered w-full max-w-xs"
-      required
-    />
-
-    <label class="label">
-      <span class="label-text">Confirm Password</span>
-    </label>
-    <input
-      type="password"
-      bind:value={confirmPassword}
-      placeholder="Confirm Password"
-      class="input input-bordered w-full max-w-xs"
-      required
-    />
-
-    <button type="submit" class="btn btn-primary mt-4">Register</button>
-
-    {#if message}
-      <div class="alert alert-info mt-4">
-        {message}
-      </div>
-    {/if}
-  </form>
+<div class="overflow-y-auto text-center font-serif my-2 px-3">
+  <!-- This needs to hold a youtube video -->
+  <div class="">
+    <div>Genesis 22:18</div>
+    <div>
+      And in thy seed shall all the nations of the earth be blessed; because
+      thou hast obeyed my voice.
+    </div>
+  </div>
 </div>
 
 ```
@@ -409,10 +384,8 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 ```
 <script>
   import "../app.pcss";
-  import Navbar from "../lib/components/Navbar.svelte";
 </script>
 
-<Navbar />
 <slot />
 
 ```
@@ -421,159 +394,19 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 ```
 <script>
-  import { onMount } from "svelte";
-  import { supabase } from "$lib/supabase";
-  import { user } from "$lib/stores";
-  import AppName from "$lib/components/AppName.svelte";
-  let showPasswordRecovery = false;
-
-  onMount(() => {
-    user.set(supabase.auth.getUser());
-    supabase.auth.onAuthStateChange((_event, session) => {
-      user.set(session?.user || null);
-    });
-  });
-
-  $: console.log("Current user: AUTH", $user);
+  import IsraelTime from "../lib/components/IsraelTime.svelte";
+  import JewishCountdown from "../lib/components/JewishCountdown.svelte";
+  import NewIsraelTime from "../lib/components/NewIsraelTime.svelte";
 </script>
 
 <!-- Auth Forms -->
 <div class="">
-  <main>
-    <h1 class="text-3xl text-center my-4 font-extrabold">
-      <AppName />
-    </h1>
-  </main>
+  <section>
+    <!-- <IsraelTime /> -->
+    <!-- <NewIsraelTime /> -->
+    <JewishCountdown />
+  </section>
 </div>
-
-```
-
-## File: routes\auth\+page.svelte
-
-```
-<script>
-  import { onMount } from "svelte";
-  import { supabase } from "$lib/supabase";
-  import { user } from "$lib/stores";
-  import Register from "$lib/components/Register.svelte";
-  import Login from "$lib/components/Login.svelte";
-  import Logout from "$lib/components/Logout.svelte";
-  import PasswordRecovery from "$lib/components/PasswordRecovery.svelte";
-  import AppName from "$lib/components/AppName.svelte";
-  let showPasswordRecovery = false;
-
-  onMount(() => {
-    user.set(supabase.auth.getUser());
-    supabase.auth.onAuthStateChange((_event, session) => {
-      user.set(session?.user || null);
-    });
-  });
-
-  $: console.log("Current user: MAIN PAGE", $user);
-
-  function togglePasswordRecovery() {
-    showPasswordRecovery = !showPasswordRecovery;
-  }
-
-  function handleRecoveryComplete() {
-    showPasswordRecovery = false;
-  }
-</script>
-
-<!-- Auth Forms -->
-<div class="">
-  <main>
-    <h1 class="text-3xl text-center my-4 font-extrabold">
-      <AppName />
-    </h1>
-
-    {#if $user}
-      <section>
-        <h2>Logout</h2>
-        <Logout />
-      </section>
-    {:else}
-      <section>
-        <h2>Register</h2>
-        <Register />
-      </section>
-
-      <section>
-        <h2>Login</h2>
-        <Login />
-      </section>
-
-      <div class="flex flex-column justify-center my-4">
-        <button on:click={togglePasswordRecovery} class="btn btn-primary">
-          Forgot Password?
-        </button>
-      </div>
-
-      {#if showPasswordRecovery}
-        <section>
-          <h2>Recover Password</h2>
-          <PasswordRecovery onRecoveryComplete={handleRecoveryComplete} />
-        </section>
-      {/if}
-    {/if}
-  </main>
-</div>
-
-<style>
-  h2 {
-    margin-top: 2rem;
-    text-align: center;
-    font-weight: bolder;
-    font-size: x-large;
-  }
-</style>
-
-```
-
-## File: routes\auth\profile\+page.svelte
-
-```
-<script>
-  import { onMount } from "svelte";
-  import { supabase } from "$lib/supabase";
-  import { format, parseISO } from "date-fns";
-
-  let user = null;
-
-  onMount(async () => {
-    const { data, error } = await supabase.auth.getUser();
-    if (error) {
-      console.log("Error fetching user:", error);
-    } else {
-      user = data.user;
-    }
-  });
-
-  $: console.log(user);
-
-  const formatDateTime = (dateString) => {
-    return format(parseISO(dateString), "PPpp");
-  };
-</script>
-
-{#if user}
-  <div class="m-4">
-    <p>Email: {user.email}</p>
-    <p>
-      Email confirmation sent at: {formatDateTime(user.confirmation_sent_at)}
-    </p>
-    <p>Email confirmed at: {formatDateTime(user.confirmed_at)}</p>
-    <p>Email created at: {formatDateTime(user.created_at)}</p>
-    <p>Email confirmed at: {formatDateTime(user.email_confirmed_at)}</p>
-    <p>Email recovery sent at: {formatDateTime(user.recovery_sent_at)}</p>
-    <p>Last Sign in: {formatDateTime(user.last_sign_in_at)}</p>
-    <p>Update at: {formatDateTime(user.updated_at)}</p>
-    <p>Phone: {user.phone || "n/a"}</p>
-    <p>Role: {user.role || "n/a"}</p>
-  </div>
-{:else}
-  <p>Loading user data...</p>
-{/if}
 
 ```
 

@@ -1,11 +1,19 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@hebcal/core': 5.0.0-rc4
+  '@hebcal/rest-api': ^5.0.0
   '@supabase/supabase-js': ^2.38.5
   '@sveltejs/adapter-auto': ^2.0.0
   '@sveltejs/kit': ^1.27.4
   autoprefixer: ^10.4.14
   daisyui: ^4.4.2
+  date-fns-tz: ^2.0.0
+  dayjs: ^1.11.10
+  hebcal: ^2.3.2
+  luxon: ^3.4.4
+  moment: ^2.29.4
+  moment-timezone: ^0.5.43
   nodemon: ^3.0.1
   postcss: ^8.4.24
   postcss-load-config: ^4.0.1
@@ -14,7 +22,15 @@ specifiers:
   vite: ^4.4.2
 
 dependencies:
+  '@hebcal/core': 5.0.0-rc4
+  '@hebcal/rest-api': 5.0.0
   '@supabase/supabase-js': 2.38.5
+  date-fns-tz: 2.0.0
+  dayjs: 1.11.10
+  hebcal: 2.3.2
+  luxon: 3.4.4
+  moment: 2.29.4
+  moment-timezone: 0.5.43
 
 devDependencies:
   '@sveltejs/adapter-auto': 2.1.1_@sveltejs+kit@1.27.6
@@ -245,6 +261,35 @@ packages:
     resolution: {integrity: sha512-+KpH+QxZU7O4675t3mnkQKcZZg56u+K/Ct2K+N2AZYNVK8kyeo/bI18tI8aPm3tvNNRyTWfj6s5tnGNlcbQRsA==}
     engines: {node: '>=14'}
     dev: true
+
+  /@hebcal/core/5.0.0-rc4:
+    resolution: {integrity: sha512-M3b+ObweiWbJyOf52huWETQ48/leLsNcTn7mwIH0eyTK/8t8C1yZruFUJDyhZDPjvwtVRIUQST6xR/++VN6GzA==}
+    engines: {node: '>= 16.0.0'}
+    dev: false
+
+  /@hebcal/leyning/8.0.0:
+    resolution: {integrity: sha512-gKCG7KQKzAfkgAjtl0cEQ31tFuJIq6nGkfnAWSd+VaPY3yM+0imEAdki+7rmptvwUADkYtMAKv3O7/pliuG50g==}
+    hasBin: true
+    dependencies:
+      '@hebcal/core': 5.0.0-rc4
+    dev: false
+
+  /@hebcal/rest-api/5.0.0:
+    resolution: {integrity: sha512-pH7IlnaJ70+aBdmcRKVv1g/NE7F05OfHZIqgmJsEuBIa0w0yJ6EOyUNd+XxBKW3yz14QeMsMpx+BB0YSp30pWg==}
+    engines: {node: '>= 16.0.0'}
+    dependencies:
+      '@hebcal/core': 5.0.0-rc4
+      '@hebcal/leyning': 8.0.0
+      '@hebcal/triennial': 5.0.0
+    dev: false
+
+  /@hebcal/triennial/5.0.0:
+    resolution: {integrity: sha512-/u2j31gskOiO9nQDixyfU6Ie+2JqR0Q2DGcKx74o9QyLufmSiyr2JgrZor97LnDygQuv3QDhkKIiHIHueGoAtQ==}
+    hasBin: true
+    dependencies:
+      '@hebcal/core': 5.0.0-rc4
+      '@hebcal/leyning': 8.0.0
+    dev: false
 
   /@jridgewell/gen-mapping/0.3.3:
     resolution: {integrity: sha512-HLhSWOLRi875zjjMG/r+Nv0oCW8umGb0BgEhyX3dDX3egwZtB8PqLnjz3yedt8R5StBrzcg4aBpnh8UA9D1BoQ==}
@@ -642,6 +687,16 @@ packages:
       - postcss
     dev: true
 
+  /date-fns-tz/2.0.0:
+    resolution: {integrity: sha512-OAtcLdB9vxSXTWHdT8b398ARImVwQMyjfYGkKD2zaGpHseG2UPHbHjXELReErZFxWdSLph3c2zOaaTyHfOhERQ==}
+    peerDependencies:
+      date-fns: '>=2.0.0'
+    dev: false
+
+  /dayjs/1.11.10:
+    resolution: {integrity: sha512-vjAczensTgRcqDERK0SR2XMwsF/tSvnvlv6VcF2GIhg6Sx4yOIt/irsr1RDJsKiIyBzJDpCoXiWWq28MqH2cnQ==}
+    dev: false
+
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
     peerDependencies:
@@ -827,6 +882,10 @@ packages:
     resolution: {integrity: sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==}
     dev: true
 
+  /gematriya/1.0.1:
+    resolution: {integrity: sha512-AG8DVjbv1Ap9b9xbnvVYXjI9LwN8c7KH4KIsIpZXzArjzvTpPRzhQ7Y4L+s0PpThUF+VTX3ThjRCjbL/Ia4y1A==}
+    dev: false
+
   /glob-parent/5.1.2:
     resolution: {integrity: sha512-AOIgSQCepiJYwP3ARnGx+5VnTu2HBYdzbGP45eLw1vr3zB3vZLeyed1sC9hnbcOc9/SrMyM5RPQrkGz4aS9Zow==}
     engines: {node: '>= 6'}
@@ -871,6 +930,14 @@ packages:
     dependencies:
       function-bind: 1.1.2
     dev: true
+
+  /hebcal/2.3.2:
+    resolution: {integrity: sha512-Lgp6eDaRUygazUzjR4D8/3zwMFs/18f/VejdCLgdfRa6HSMqb9BS+0u8XAN9GxHP77hooA/mB/R+K4Y4lQNaIw==}
+    hasBin: true
+    dependencies:
+      gematriya: 1.0.1
+      suncalc: 1.9.0
+    dev: false
 
   /ignore-by-default/1.0.1:
     resolution: {integrity: sha512-Ius2VYcGNk7T90CppJqcIkS5ooHUZyIQK+ClZfMfMNFEF9VSE73Fq+906u/CWu92x4gzZMWOwfFYckPObzdEbA==}
@@ -966,6 +1033,11 @@ packages:
       yallist: 4.0.0
     dev: true
 
+  /luxon/3.4.4:
+    resolution: {integrity: sha512-zobTr7akeGHnv7eBOXcRgMeCP6+uyYsczwmeRCauvpvaAltgNyTbLH/+VaEAPUeWBT+1GuNmz4wC/6jtQzbbVA==}
+    engines: {node: '>=12'}
+    dev: false
+
   /magic-string/0.30.5:
     resolution: {integrity: sha512-7xlpfBaQaP/T6Vh8MO/EqXSW5En6INHEvEXQiuff7Gku0PWjU3uf6w/j9o7O+SpB5fOAkrI5HeoNgwjEO0pFsA==}
     engines: {node: '>=12'}
@@ -995,6 +1067,16 @@ packages:
     dependencies:
       brace-expansion: 1.1.11
     dev: true
+
+  /moment-timezone/0.5.43:
+    resolution: {integrity: sha512-72j3aNyuIsDxdF1i7CEgV2FfxM1r6aaqJyLB2vwb33mXYyoyLly+F1zbWqhA3/bVIoJ4szlUoMbUnVdid32NUQ==}
+    dependencies:
+      moment: 2.29.4
+    dev: false
+
+  /moment/2.29.4:
+    resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==}
+    dev: false
 
   /mri/1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
@@ -1299,6 +1381,10 @@ packages:
       pirates: 4.0.6
       ts-interface-checker: 0.1.13
     dev: true
+
+  /suncalc/1.9.0:
+    resolution: {integrity: sha512-vMJ8Byp1uIPoj+wb9c1AdK4jpkSKVAywgHX0lqY7zt6+EWRRC3Z+0Ucfjy/0yxTVO1hwwchZe4uoFNqrIC24+A==}
+    dev: false
 
   /supports-color/5.5.0:
     resolution: {integrity: sha512-QjVjwdXIt408MIiAqCX4oUKsgU2EqAGzs2Ppkm4aQYbjm+ZEWEcW4SfFNTr4uMNZma0ey4f5lgLrkB0aX0QMow==}

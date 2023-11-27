@@ -21,6 +21,14 @@
   },
   "type": "module",
   "dependencies": {
-    "@supabase/supabase-js": "^2.38.5"
+    "@hebcal/core": "5.0.0-rc4",
+    "@hebcal/rest-api": "^5.0.0",
+    "@supabase/supabase-js": "^2.38.5",
+    "date-fns-tz": "^2.0.0",
+    "dayjs": "^1.11.10",
+    "hebcal": "^2.3.2",
+    "luxon": "^3.4.4",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43"
   }
 }
