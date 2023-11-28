@@ -7,7 +7,7 @@
     : "(.env) VITE_APPNAME=YourName)";
 </script>
 
-<span>{appname}</span>
+<span class="uppercase">{appname}</span>
 
 ```
 
